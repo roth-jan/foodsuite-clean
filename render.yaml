@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: foodsuite-app
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEFAULT_TENANT_ID
+        value: demo
+      - key: DB_TYPE
+        value: memory
+      - key: JWT_SECRET
+        generateValue: true

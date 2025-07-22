@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: foodsuite
+      POSTGRES_USER: foodsuite
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-foodsuite123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodsuite"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  foodsuite-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - CORS_ORIGIN=*
+      - DB_TYPE=${DB_TYPE:-memory}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=foodsuite
+      - DB_USER=foodsuite
+      - DB_PASSWORD=${DB_PASSWORD:-foodsuite123}
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: npm start
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - foodsuite-app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
