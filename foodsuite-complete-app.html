@@ -11746,10 +11746,67 @@ Salt, Pfeffer nach Geschmack</textarea>
         };
         
         // Fallback Demo-Plan Funktion
+        // Fallback Demo-Plan Funktion
         function createDemoMealPlan() {
+            console.log('📝 Creating demo meal plan...');
+            
             const demoMealPlan = {
                 'montag-lunch': { id: 'demo1', name: 'Spaghetti Bolognese', portions: 400, cost: 3.20 },
                 'dienstag-lunch': { id: 'demo2', name: 'Schnitzel mit Pommes', portions: 400, cost: 4.50 },
+                'mittwoch-lunch': { id: 'demo3', name: 'Gulasch mit Reis', portions: 400, cost: 3.80 },
+                'donnerstag-lunch': { id: 'demo4', name: 'Hähnchen Curry', portions: 400, cost: 3.90 },
+                'freitag-lunch': { id: 'demo5', name: 'Pizza Margherita', portions: 400, cost: 2.80 }
+            };
+            
+            // Direkt in AppData setzen
+            if (!window.AppData) window.AppData = {};
+            AppData.mealPlan = demoMealPlan;
+            
+            console.log('📅 Demo meal plan created:', demoMealPlan);
+            
+            // Direkt Kalender aktualisieren
+            setTimeout(() => {
+                if (typeof createMealCalendar === 'function') {
+                    createMealCalendar();
+                    console.log('✅ Calendar updated with demo data');
+                } else {
+                    // Manual calendar update
+                    updateCalendarWithDemoData(demoMealPlan);
+                }
+            }, 100);
+            
+            showToast('✅ Demo-Speiseplan erstellt!', 'success');
+        }
+        
+        // Manuelle Kalender-Update Funktion
+        function updateCalendarWithDemoData(mealPlan) {
+            console.log('🔄 Manually updating calendar...');
+            
+            Object.keys(mealPlan).forEach(slot => {
+                const meal = mealPlan[slot];
+                const [day, mealType] = slot.split('-');
+                
+                // Finde die entsprechende Kalenderzelle
+                const cell = document.querySelector(`[data-day="${day}"][data-meal="${mealType}"],
+                                                    .calendar-day[data-day="${day}"] .meal-slot[${mealType}],
+                                                    .${day}-${mealType}`);
+                
+                if (cell) {
+                    cell.innerHTML = `
+                        <div class="meal-event lunch" draggable="true" data-recipe-id="${meal.id}">
+                            <div class="meal-title">${meal.name}</div>
+                            <div class="meal-details">
+                                ${meal.portions} Portionen
+                                €${meal.cost.toFixed(2)}/Portion
+                            </div>
+                        </div>
+                    `;
+                    console.log(`✅ Updated cell for ${slot}`);
+                } else {
+                    console.warn(`❌ Could not find cell for ${slot}`);
+                }
+            });
+        },
                 'mittwoch-lunch': { id: 'demo3', name: 'Gulasch mit Reis', portions: 400, cost: 3.80 },
                 'donnerstag-lunch': { id: 'demo4', name: 'Hähnchen Curry', portions: 400, cost: 3.90 },
                 'freitag-lunch': { id: 'demo5', name: 'Pizza Margherita', portions: 400, cost: 2.80 }
