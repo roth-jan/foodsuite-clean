@@ -11,8 +11,8 @@ const fs = require('fs');
 
 // Import routes
 const authRoutes = require('./routes/auth-temp'); // Temporary fix for Render
-const userRoutes = require('./routes/users');
-const roleRoutes = require('./routes/roles');
+// const userRoutes = require('./routes/users'); // Temporarily disabled
+// const roleRoutes = require('./routes/roles'); // Temporarily disabled
 const productRoutes = require('./routes/products');
 const supplierRoutes = require('./routes/suppliers');
 const orderRoutes = require('./routes/orders');
